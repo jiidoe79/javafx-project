@@ -1,8 +1,11 @@
 package com.company;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -12,13 +15,13 @@ import javafx.stage.StageStyle;
 public class App extends Application {
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Something else");
+        //Set the Stage in place
+        stage.setTitle("Juha's Code Editor");
         stage.initStyle(StageStyle.UTILITY);
-        //stage.setWidth(640);
-        //stage.setHeight(480);
         stage.setX(600);
         stage.setY(300);
         stage.show();
+        //Set Menus and Menuitems
         Menu fileMenu = new Menu("File");
         MenuItem fileItemNew = new MenuItem("New (Ctrl + N)");
         MenuItem fileItemOpen = new MenuItem("Open (Ctrl + O)");
@@ -48,7 +51,9 @@ public class App extends Application {
         mbar.getMenus().add(editMenu);
         mbar.getMenus().add(runMenu);
         mbar.getMenus().add(aboutMenu);
+        //Add toolbar buttons
         Button clearButton = new Button ("Clear");
+        //Define layout and scene
         VBox topPanel = new VBox(mbar, clearButton);
         TextArea textPanel = new TextArea();
         BorderPane bpane = new BorderPane();
@@ -56,6 +61,9 @@ public class App extends Application {
         bpane.setCenter(textPanel);
         Scene scene = new Scene(bpane, 640, 480);
         stage.setScene(scene);
+        //Define actions and functions
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
         FileChooser fileChooser = new FileChooser();
         fileItemOpen.setOnAction(e -> {
             fileChooser.showOpenDialog(stage);
