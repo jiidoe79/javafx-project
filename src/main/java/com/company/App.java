@@ -24,8 +24,11 @@ public class App extends Application {
         //Set Menus and Menuitems
         Menu fileMenu = new Menu("File");
         MenuItem fileItemNew = new MenuItem("New (Ctrl + N)");
+        fileItemNew.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN));
         MenuItem fileItemOpen = new MenuItem("Open (Ctrl + O)");
+        fileItemOpen.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
         MenuItem fileItemSave = new MenuItem("Save (Ctrl + S)");
+        fileItemSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN));
         MenuItem fileItemEmpty = new MenuItem("---");
         MenuItem fileItemExit = new MenuItem("Exit Program");
         fileMenu.getItems().add(fileItemNew);
@@ -35,8 +38,11 @@ public class App extends Application {
         fileMenu.getItems().add(fileItemExit);
         Menu editMenu = new Menu("Edit");
         MenuItem editItemCut = new MenuItem("Cut (Ctrl + X)");
+        editItemCut.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN));
         MenuItem editItemCopy = new MenuItem("Copy (Ctrl + C)");
+        editItemCopy.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
         MenuItem editItemPaste = new MenuItem("Paste (Ctrl + V)");
+        editItemPaste.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN));
         editMenu.getItems().add(editItemCut);
         editMenu.getItems().add(editItemCopy);
         editMenu.getItems().add(editItemPaste);
@@ -73,6 +79,15 @@ public class App extends Application {
         });
         fileItemExit.setOnAction(e -> {
             System.exit(0);
+        });
+        editItemCopy.setOnAction(e -> {
+            textPanel.copy();
+        });
+        editItemCut.setOnAction(e -> {
+            textPanel.cut();
+        });
+        editItemPaste.setOnAction(e -> {
+            textPanel.paste();
         });
         aboutItemAbout.setOnAction(e -> {
             Alert about = new Alert(Alert.AlertType.INFORMATION);
