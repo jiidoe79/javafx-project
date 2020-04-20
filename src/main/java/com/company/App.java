@@ -1,8 +1,6 @@
 package com.company;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
@@ -11,46 +9,50 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class App extends Application {
     @Override
     public void start(Stage stage) {
         //Set the Stage in place
-        stage.setTitle("Juha's Code Editor");
+        Locale locale = Locale.getDefault();
+        ResourceBundle labels = ResourceBundle.getBundle("ui", locale);
+        stage.setTitle(labels.getString("title"));
         stage.initStyle(StageStyle.UTILITY);
         stage.setX(600);
         stage.setY(300);
         stage.show();
         //Set Menus and Menuitems
-        Menu fileMenu = new Menu("File");
-        MenuItem fileItemNew = new MenuItem("New (Ctrl + N)");
+        Menu fileMenu = new Menu(labels.getString("fileMenu"));
+        MenuItem fileItemNew = new MenuItem(labels.getString("fileItemNew"));
         fileItemNew.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN));
-        MenuItem fileItemOpen = new MenuItem("Open (Ctrl + O)");
+        MenuItem fileItemOpen = new MenuItem(labels.getString("fileItemOpen"));
         fileItemOpen.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
-        MenuItem fileItemSave = new MenuItem("Save (Ctrl + S)");
+        MenuItem fileItemSave = new MenuItem(labels.getString("fileItemSave"));
         fileItemSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN));
         MenuItem fileItemEmpty = new MenuItem("---");
-        MenuItem fileItemExit = new MenuItem("Exit Program");
+        MenuItem fileItemExit = new MenuItem(labels.getString("fileItemExit"));
         fileMenu.getItems().add(fileItemNew);
         fileMenu.getItems().add(fileItemOpen);
         fileMenu.getItems().add(fileItemSave);
         fileMenu.getItems().add(fileItemEmpty);
         fileMenu.getItems().add(fileItemExit);
-        Menu editMenu = new Menu("Edit");
-        MenuItem editItemCut = new MenuItem("Cut (Ctrl + X)");
+        Menu editMenu = new Menu(labels.getString("editMenu"));
+        MenuItem editItemCut = new MenuItem(labels.getString("editItemCut"));
         editItemCut.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN));
-        MenuItem editItemCopy = new MenuItem("Copy (Ctrl + C)");
+        MenuItem editItemCopy = new MenuItem(labels.getString("editItemCopy"));
         editItemCopy.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
-        MenuItem editItemPaste = new MenuItem("Paste (Ctrl + V)");
+        MenuItem editItemPaste = new MenuItem(labels.getString("editItemPaste"));
         editItemPaste.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN));
         editMenu.getItems().add(editItemCut);
         editMenu.getItems().add(editItemCopy);
         editMenu.getItems().add(editItemPaste);
-        Menu runMenu = new Menu("Run");
-        MenuItem runItemCNR = new Menu("Compile and Run");
+        Menu runMenu = new Menu(labels.getString("runMenu"));
+        MenuItem runItemCNR = new Menu(labels.getString("runItemCNR"));
         runMenu.getItems().add(runItemCNR);
-        Menu aboutMenu = new Menu("About");
-        MenuItem aboutItemAbout = new MenuItem ("About the app");
+        Menu aboutMenu = new Menu(labels.getString("aboutMenu"));
+        MenuItem aboutItemAbout = new MenuItem (labels.getString("aboutItemAbout"));
         aboutMenu.getItems().add(aboutItemAbout);
         MenuBar mbar = new MenuBar();
         mbar.getMenus().add(fileMenu);
@@ -58,7 +60,7 @@ public class App extends Application {
         mbar.getMenus().add(runMenu);
         mbar.getMenus().add(aboutMenu);
         //Add toolbar buttons
-        Button clearButton = new Button ("Clear");
+        Button clearButton = new Button (labels.getString("clearButton"));
         //Define layout and scene
         VBox topPanel = new VBox(mbar, clearButton);
         TextArea textPanel = new TextArea();
@@ -91,9 +93,9 @@ public class App extends Application {
         });
         aboutItemAbout.setOnAction(e -> {
             Alert about = new Alert(Alert.AlertType.INFORMATION);
-            about.setTitle("About this application");
+            about.setTitle(labels.getString("aboutTitle"));
             about.setHeaderText(null);
-            about.setContentText("This little app is made to show what I can do with Java\nEnjoy the ride!");
+            about.setContentText(labels.getString("aboutContent"));
             about.showAndWait();
         });
         clearButton.setOnAction(actionEvent ->  {
