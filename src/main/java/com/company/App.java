@@ -1,11 +1,11 @@
 package com.company;
 
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -51,15 +51,27 @@ public class App extends Application {
         Button clearButton = new Button ("Clear");
         VBox topPanel = new VBox(mbar, clearButton);
         TextArea textPanel = new TextArea();
-        //worldButton.setTranslateY( 400 - worldButton.getHeight());
-        //worldButton.setTranslateX( 600 - worldButton.getWidth());
         BorderPane bpane = new BorderPane();
         bpane.setTop(topPanel);
         bpane.setCenter(textPanel);
         Scene scene = new Scene(bpane, 640, 480);
         stage.setScene(scene);
+        FileChooser fileChooser = new FileChooser();
+        fileItemOpen.setOnAction(e -> {
+            fileChooser.showOpenDialog(stage);
+        });
+        fileItemSave.setOnAction(e -> {
+            fileChooser.showOpenDialog(stage);
+        });
         fileItemExit.setOnAction(e -> {
             System.exit(0);
+        });
+        aboutItemAbout.setOnAction(e -> {
+            Alert about = new Alert(Alert.AlertType.INFORMATION);
+            about.setTitle("About this application");
+            about.setHeaderText(null);
+            about.setContentText("This little app is made to show what I can do with Java\nEnjoy the ride!");
+            about.showAndWait();
         });
         clearButton.setOnAction(actionEvent ->  {
             textPanel.setText("");
