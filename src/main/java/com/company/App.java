@@ -1,6 +1,7 @@
 package com.company;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
@@ -9,6 +10,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -33,11 +36,8 @@ public class App extends Application {
         fileItemSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN));
         MenuItem fileItemEmpty = new MenuItem("---");
         MenuItem fileItemExit = new MenuItem(labels.getString("fileItemExit"));
-        fileMenu.getItems().add(fileItemNew);
-        fileMenu.getItems().add(fileItemOpen);
-        fileMenu.getItems().add(fileItemSave);
-        fileMenu.getItems().add(fileItemEmpty);
-        fileMenu.getItems().add(fileItemExit);
+        List<MenuItem> fileitems = List.of(fileItemNew, fileItemOpen, fileItemSave, fileItemEmpty, fileItemExit);
+        fileMenu.getItems().addAll(fileitems);
         Menu editMenu = new Menu(labels.getString("editMenu"));
         MenuItem editItemCut = new MenuItem(labels.getString("editItemCut"));
         editItemCut.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN));
@@ -45,9 +45,8 @@ public class App extends Application {
         editItemCopy.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
         MenuItem editItemPaste = new MenuItem(labels.getString("editItemPaste"));
         editItemPaste.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN));
-        editMenu.getItems().add(editItemCut);
-        editMenu.getItems().add(editItemCopy);
-        editMenu.getItems().add(editItemPaste);
+        List<MenuItem> edititems = List.of(editItemCut, editItemCopy, editItemPaste);
+        editMenu.getItems().addAll(edititems);
         Menu runMenu = new Menu(labels.getString("runMenu"));
         MenuItem runItemCNR = new Menu(labels.getString("runItemCNR"));
         runMenu.getItems().add(runItemCNR);
@@ -73,6 +72,14 @@ public class App extends Application {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
         FileChooser fileChooser = new FileChooser();
+        textPanel.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent e) {
+                if (e.getCode() == KeyCode.TAB) {
+                    int x = textPanel.getCaretPosition();
+                    textPanel.replaceText(x-1, x, "    ");
+                }
+            }
+        });
         fileItemOpen.setOnAction(e -> {
             fileChooser.showOpenDialog(stage);
         });
