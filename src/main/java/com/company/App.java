@@ -1,12 +1,15 @@
 package com.company;
 
 import javafx.application.Application;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -16,6 +19,13 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class App extends Application {
+    public String toRgbString(Color c) {
+        return "rgb("
+                + (c.getRed() * 255)
+                + "," + (c.getGreen() * 255)
+                + "," + (c.getBlue() * 255)
+                + ")";
+    }
     @Override
     public void start(Stage stage) {
         //Set the Stage in place
@@ -60,8 +70,10 @@ public class App extends Application {
         mbar.getMenus().add(aboutMenu);
         //Add toolbar buttons
         Button clearButton = new Button (labels.getString("clearButton"));
+        ColorPicker colorPicker = new ColorPicker();
         //Define layout and scene
-        VBox topPanel = new VBox(mbar, clearButton);
+        HBox toolBar = new HBox(clearButton, colorPicker);
+        VBox topPanel = new VBox(mbar, toolBar);
         TextArea textPanel = new TextArea();
         BorderPane bpane = new BorderPane();
         bpane.setTop(topPanel);
@@ -69,6 +81,11 @@ public class App extends Application {
         Scene scene = new Scene(bpane, 640, 480);
         stage.setScene(scene);
         //Define actions and functions
+        colorPicker.setOnAction(new EventHandler() {
+            public void handle(Event t) {
+                textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + ";");
+            }
+        });
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
         FileChooser fileChooser = new FileChooser();
