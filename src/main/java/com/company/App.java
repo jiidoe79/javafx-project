@@ -57,9 +57,12 @@ public class App extends Application {
         fileItemOpen.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
         MenuItem fileItemSave = new MenuItem(labels.getString("fileItemSave"));
         fileItemSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN));
+        fileItemSave.setDisable(true);
+        MenuItem fileItemSaveAs = new MenuItem(labels.getString("fileItemSaveAs"));
+        fileItemSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN));
         MenuItem fileItemEmpty = new MenuItem("---");
         MenuItem fileItemExit = new MenuItem(labels.getString("fileItemExit"));
-        List<MenuItem> fileitems = List.of(fileItemNew, fileItemOpen, fileItemSave, fileItemEmpty, fileItemExit);
+        List<MenuItem> fileitems = List.of(fileItemNew, fileItemOpen, fileItemSave, fileItemSaveAs, fileItemEmpty, fileItemExit);
         fileMenu.getItems().addAll(fileitems);
         Menu editMenu = new Menu(labels.getString("editMenu"));
         MenuItem editItemCut = new MenuItem(labels.getString("editItemCut"));
@@ -129,9 +132,25 @@ public class App extends Application {
                 textPanel.setText(content);
                 fileChooser.setInitialDirectory(new File(file.getParent()));
                 lastFile.set(fh.getFilePath());
+                fileItemSave.setDisable(false);
             } catch(NullPointerException npe) {}
         });
         fileItemSave.setOnAction(e -> {
+            try {
+                Alert saveAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                saveAlert.setTitle(labels.getString("saveAlertTitle"));
+                saveAlert.setHeaderText(null);
+                saveAlert.setContentText(labels.getString("saveAlertContent"));
+                Optional<ButtonType> result = saveAlert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    File file = new File(lastFile.get());
+                    FileHandler fh = new FileHandler(file.getAbsolutePath());
+                    String content = textPanel.getText();
+                    fh.save(content);
+                }
+            } catch(RuntimeException npe) {}
+        });
+        fileItemSaveAs.setOnAction(e -> {
             try {
                 File file = new File(String.valueOf(fileChooser.showSaveDialog(stage)));
                 FileHandler fh = new FileHandler(file.getAbsolutePath());
@@ -139,6 +158,7 @@ public class App extends Application {
                 fh.save(content);
                 fileChooser.setInitialDirectory(new File(file.getParent()));
                 lastFile.set(fh.getFilePath());
+                fileItemSave.setDisable(false);
             } catch(NullPointerException npe) {}
         });
         fileItemExit.setOnAction(e -> {
