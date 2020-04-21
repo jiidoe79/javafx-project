@@ -1,5 +1,6 @@
 package com.company;
 
+import com.company.util.FileHandler;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -14,6 +15,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -87,7 +89,7 @@ public class App extends Application {
             }
         });
         final Clipboard clipboard = Clipboard.getSystemClipboard();
-        final ClipboardContent content = new ClipboardContent();
+        final ClipboardContent cbcontent = new ClipboardContent();
         FileChooser fileChooser = new FileChooser();
         textPanel.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent e) {
@@ -98,10 +100,16 @@ public class App extends Application {
             }
         });
         fileItemOpen.setOnAction(e -> {
-            fileChooser.showOpenDialog(stage);
+            File file = new File(String.valueOf(fileChooser.showOpenDialog(stage)));
+            FileHandler fh = new FileHandler(file.getAbsolutePath());
+            String content = fh.open();
+            textPanel.setText(content);
         });
         fileItemSave.setOnAction(e -> {
-            fileChooser.showOpenDialog(stage);
+            File file = new File(String.valueOf(fileChooser.showSaveDialog(stage)));
+            FileHandler fh = new FileHandler(file.getAbsolutePath());
+            String content = textPanel.getText();
+            fh.save(content);
         });
         fileItemExit.setOnAction(e -> {
             System.exit(0);
