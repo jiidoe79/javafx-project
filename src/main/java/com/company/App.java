@@ -2,7 +2,6 @@ package com.company;
 
 import com.company.util.FileHandler;
 import javafx.application.Application;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -18,6 +17,7 @@ import javafx.stage.StageStyle;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class App extends Application {
@@ -66,7 +66,7 @@ public class App extends Application {
         MenuItem aboutItemAbout = new MenuItem (labels.getString("aboutItemAbout"));
         aboutMenu.getItems().add(aboutItemAbout);
         MenuBar mbar = new MenuBar();
-        mbar.getMenus().add(fileMenu);
+        mbar.getMenus().addAll(fileMenu);
         mbar.getMenus().add(editMenu);
         mbar.getMenus().add(runMenu);
         mbar.getMenus().add(aboutMenu);
@@ -83,20 +83,24 @@ public class App extends Application {
         Scene scene = new Scene(bpane, 640, 480);
         stage.setScene(scene);
         //Define actions and functions
-        colorPicker.setOnAction(new EventHandler() {
-            public void handle(Event t) {
-                textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + ";");
+        colorPicker.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + ";"));
+        //final Clipboard clipboard = Clipboard.getSystemClipboard();
+        //final ClipboardContent cbcontent = new ClipboardContent();
+        FileChooser fileChooser = new FileChooser();
+        textPanel.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.TAB) {
+                int x = textPanel.getCaretPosition();
+                textPanel.replaceText(x-1, x, "    ");
             }
         });
-        final Clipboard clipboard = Clipboard.getSystemClipboard();
-        final ClipboardContent cbcontent = new ClipboardContent();
-        FileChooser fileChooser = new FileChooser();
-        textPanel.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            public void handle(KeyEvent e) {
-                if (e.getCode() == KeyCode.TAB) {
-                    int x = textPanel.getCaretPosition();
-                    textPanel.replaceText(x-1, x, "    ");
-                }
+        fileItemNew.setOnAction(e -> {
+            Alert newAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            newAlert.setTitle(labels.getString("newAlertTitle"));
+            newAlert.setHeaderText(null);
+            newAlert.setContentText(labels.getString("newAlertContent"));
+            Optional<ButtonType> result = newAlert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                textPanel.setText("");
             }
         });
         fileItemOpen.setOnAction(e -> {

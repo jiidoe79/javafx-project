@@ -24,7 +24,6 @@ public class FileHandler {
 
     public FileHandler() {}
 
-    // Opens the given file and returns the content, uses filePath
     public String open() {
         try {
             content = Files.readString(Paths.get(filePath));
