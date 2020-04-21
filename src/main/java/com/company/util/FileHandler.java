@@ -18,7 +18,7 @@ public class FileHandler {
         this.filePath = filePath;
     }
 
-    private String getFilePath() {
+    public String getFilePath() {
         return this.filePath;
     }
 

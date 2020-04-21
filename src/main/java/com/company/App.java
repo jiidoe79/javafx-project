@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class App extends Application {
     public String toRgbString(Color c) {
@@ -28,9 +29,17 @@ public class App extends Application {
                 + "," + (c.getBlue() * 255)
                 + ")";
     }
+    public void errorBox (String errormessage) {
+        Alert errorbox = new Alert(Alert.AlertType.INFORMATION);
+        errorbox.setTitle("Error occured");
+        errorbox.setHeaderText(null);
+        errorbox.setContentText(errormessage);
+        errorbox.showAndWait();
+    }
     @Override
     public void start(Stage stage) {
         //Set the Stage in place
+        AtomicReference<String> lastFile = new AtomicReference<>("");
         Locale locale = Locale.getDefault();
         ResourceBundle labels = ResourceBundle.getBundle("ui", locale);
         stage.setTitle(labels.getString("title"));
@@ -71,10 +80,9 @@ public class App extends Application {
         mbar.getMenus().add(runMenu);
         mbar.getMenus().add(aboutMenu);
         //Add toolbar buttons
-        Button clearButton = new Button (labels.getString("clearButton"));
         ColorPicker colorPicker = new ColorPicker();
         //Define layout and scene
-        HBox toolBar = new HBox(clearButton, colorPicker);
+        HBox toolBar = new HBox(colorPicker);
         VBox topPanel = new VBox(mbar, toolBar);
         TextArea textPanel = new TextArea();
         BorderPane bpane = new BorderPane();
@@ -104,16 +112,24 @@ public class App extends Application {
             }
         });
         fileItemOpen.setOnAction(e -> {
-            File file = new File(String.valueOf(fileChooser.showOpenDialog(stage)));
-            FileHandler fh = new FileHandler(file.getAbsolutePath());
-            String content = fh.open();
-            textPanel.setText(content);
+            try {
+                File file = new File(String.valueOf(fileChooser.showOpenDialog(stage)));
+                FileHandler fh = new FileHandler(file.getAbsolutePath());
+                String content = fh.open();
+                textPanel.setText(content);
+                fileChooser.setInitialDirectory(new File(file.getParent()));
+                lastFile.set(fh.getFilePath());
+            } catch(NullPointerException npe) {}
         });
         fileItemSave.setOnAction(e -> {
-            File file = new File(String.valueOf(fileChooser.showSaveDialog(stage)));
-            FileHandler fh = new FileHandler(file.getAbsolutePath());
-            String content = textPanel.getText();
-            fh.save(content);
+            try {
+                File file = new File(String.valueOf(fileChooser.showSaveDialog(stage)));
+                FileHandler fh = new FileHandler(file.getAbsolutePath());
+                String content = textPanel.getText();
+                fh.save(content);
+                fileChooser.setInitialDirectory(new File(file.getParent()));
+                lastFile.set(fh.getFilePath());
+            } catch(NullPointerException npe) {}
         });
         fileItemExit.setOnAction(e -> {
             System.exit(0);
@@ -133,9 +149,6 @@ public class App extends Application {
             about.setHeaderText(null);
             about.setContentText(labels.getString("aboutContent"));
             about.showAndWait();
-        });
-        clearButton.setOnAction(actionEvent ->  {
-            textPanel.setText("");
         });
     }
 
