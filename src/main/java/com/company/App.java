@@ -2,6 +2,7 @@ package com.company;
 
 import com.company.util.FileHandler;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -10,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -79,10 +81,16 @@ public class App extends Application {
         mbar.getMenus().add(editMenu);
         mbar.getMenus().add(runMenu);
         mbar.getMenus().add(aboutMenu);
-        //Add toolbar buttons
+        //Add toolbar items
+        Label fontLabel = new Label (" Font style ");
+        Label fontsizeLabel = new Label (" Font size ");
+        Label fontcolorLabel = new Label (" Font color ");
         ColorPicker colorPicker = new ColorPicker();
+        ComboBox fontSelector = new ComboBox(FXCollections.observableArrayList(Font.getFontNames()));
+        String fontSizes[] = {"10", "12", "14", "16", "18", "20", "24", "28", "32", "40"};
+        ComboBox fontSizeSelector = new ComboBox(FXCollections.observableArrayList(fontSizes));
         //Define layout and scene
-        HBox toolBar = new HBox(colorPicker);
+        HBox toolBar = new HBox(fontLabel, fontSelector, fontsizeLabel, fontSizeSelector, fontcolorLabel, colorPicker);
         VBox topPanel = new VBox(mbar, toolBar);
         TextArea textPanel = new TextArea();
         BorderPane bpane = new BorderPane();
@@ -92,6 +100,8 @@ public class App extends Application {
         stage.setScene(scene);
         //Define actions and functions
         colorPicker.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + ";"));
+        fontSelector.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-font-family: " + (fontSelector.getValue()) + ";"));
+        fontSizeSelector.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-font-size: " + (fontSizeSelector.getValue()) + " px;"));
         //final Clipboard clipboard = Clipboard.getSystemClipboard();
         //final ClipboardContent cbcontent = new ClipboardContent();
         FileChooser fileChooser = new FileChooser();
