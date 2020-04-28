@@ -3,8 +3,10 @@ package com.company;
 import com.company.util.FileHandler;
 import com.company.util.searchEngine;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -71,9 +73,9 @@ public class App extends Application {
         fileItemSave.setDisable(true);
         MenuItem fileItemSaveAs = new MenuItem(labels.getString("fileItemSaveAs"));
         fileItemSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN));
-        MenuItem fileItemEmpty = new MenuItem("---");
+        MenuItem menuSeparator = new MenuItem(" ");
         MenuItem fileItemExit = new MenuItem(labels.getString("fileItemExit"));
-        List<MenuItem> fileitems = List.of(fileItemNew, fileItemOpen, fileItemSave, fileItemSaveAs, fileItemEmpty, fileItemExit);
+        List<MenuItem> fileitems = List.of(fileItemNew, fileItemOpen, fileItemSave, fileItemSaveAs, menuSeparator, fileItemExit);
         fileMenu.getItems().addAll(fileitems);
         Menu editMenu = new Menu(labels.getString("editMenu"));
         MenuItem editItemCut = new MenuItem(labels.getString("editItemCut"));
@@ -207,8 +209,13 @@ public class App extends Application {
             try {
                 File file = new File(String.valueOf(fileChooser.showOpenDialog(stage)));
                 FileHandler fh = new FileHandler(file.getAbsolutePath());
-                String content = fh.open();
-                textPanel.setText(content);
+                Thread t = new Thread(() -> {
+                    String content = fh.open();
+                    Platform.runLater(() -> textPanel.setText(content));
+                });
+                t.start();
+                //String content = fh.open();
+                //textPanel.setText(content);
                 fileChooser.setInitialDirectory(new File(file.getParent()));
                 lastFile.set(fh.getFilePath());
                 fileItemSave.setDisable(false);
@@ -224,8 +231,11 @@ public class App extends Application {
                 if (result.get() == ButtonType.OK){
                     File file = new File(lastFile.get());
                     FileHandler fh = new FileHandler(file.getAbsolutePath());
-                    String content = textPanel.getText();
-                    fh.save(content);
+                    Thread t = new Thread(() -> {
+                        String content = textPanel.getText();
+                        fh.save(content);
+                    });
+                    t.start();
                 }
             } catch(RuntimeException npe) {}
         });
@@ -233,8 +243,11 @@ public class App extends Application {
             try {
                 File file = new File(String.valueOf(fileChooser.showSaveDialog(stage)));
                 FileHandler fh = new FileHandler(file.getAbsolutePath());
-                String content = textPanel.getText();
-                fh.save(content);
+                Thread t = new Thread(() -> {
+                    String content = textPanel.getText();
+                    fh.save(content);
+                });
+                t.start();
                 fileChooser.setInitialDirectory(new File(file.getParent()));
                 lastFile.set(fh.getFilePath());
                 fileItemSave.setDisable(false);
