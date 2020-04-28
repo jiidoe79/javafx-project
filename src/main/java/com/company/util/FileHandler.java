@@ -1,6 +1,8 @@
 
 package com.company.util;
 
+import com.company.App;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,8 +30,7 @@ public class FileHandler {
         try {
             content = Files.readString(Paths.get(filePath));
         } catch(IOException e) {
-            System.out.println("problem with IO");
-            e.printStackTrace();
+            App.errorBox("Problem with IO");
         }
         return content;
     }
@@ -38,8 +39,7 @@ public class FileHandler {
         try {
             Files.writeString(Paths.get(filePath), content);
         } catch(IOException e) {
-            System.out.println("problem with IO");
-            e.printStackTrace();
+            App.errorBox("Problem with IO");
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.company;
 
 import com.company.util.FileHandler;
+import com.company.util.searchEngine;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
@@ -31,12 +32,12 @@ public class App extends Application {
                 + "," + (c.getBlue() * 255)
                 + ")";
     }
-    public void errorBox (String errormessage) {
-        Alert errorbox = new Alert(Alert.AlertType.INFORMATION);
-        errorbox.setTitle("Error occured");
-        errorbox.setHeaderText(null);
-        errorbox.setContentText(errormessage);
-        errorbox.showAndWait();
+    public static void errorBox(String errormessage) {
+            Alert errorbox = new Alert(Alert.AlertType.INFORMATION);
+            errorbox.setTitle("Error occured");
+            errorbox.setHeaderText(null);
+            errorbox.setContentText(errormessage);
+            errorbox.showAndWait();
     }
     @Override
     public void start(Stage stage) {
@@ -49,6 +50,9 @@ public class App extends Application {
         stage.setX(600);
         stage.setY(300);
         stage.show();
+        var ref = new Object() {
+            int request = 0;
+        };
         //Set Menus and Menuitems
         Menu fileMenu = new Menu(labels.getString("fileMenu"));
         MenuItem fileItemNew = new MenuItem(labels.getString("fileItemNew"));
@@ -89,22 +93,69 @@ public class App extends Application {
         Label fontsizeLabel = new Label (" Font size ");
         Label fontcolorLabel = new Label (" Font color ");
         ColorPicker colorPicker = new ColorPicker();
-        ComboBox fontSelector = new ComboBox(FXCollections.observableArrayList(Font.getFontNames()));
+        colorPicker.setValue(Color.BLACK);
+        ComboBox fontSelector = new ComboBox(FXCollections.observableArrayList(Font.getFamilies()));
         String fontSizes[] = {"10", "12", "14", "16", "18", "20", "24", "28", "32", "40"};
         ComboBox fontSizeSelector = new ComboBox(FXCollections.observableArrayList(fontSizes));
+        TextField searchField = new TextField();
+        Button searchPrevButton = new Button("<");
+        Button searchNextButton = new Button(">");
+        searchNextButton.setDisable(true);
+        searchPrevButton.setDisable(true);
         //Define layout and scene
-        HBox toolBar = new HBox(fontLabel, fontSelector, fontsizeLabel, fontSizeSelector, fontcolorLabel, colorPicker);
+        HBox toolBar = new HBox(fontLabel, fontSelector, fontsizeLabel, fontSizeSelector, fontcolorLabel, colorPicker, searchField, searchPrevButton, searchNextButton);
         VBox topPanel = new VBox(mbar, toolBar);
         TextArea textPanel = new TextArea();
         BorderPane bpane = new BorderPane();
         bpane.setTop(topPanel);
         bpane.setCenter(textPanel);
-        Scene scene = new Scene(bpane, 640, 480);
+        Scene scene = new Scene(bpane, 960, 640);
         stage.setScene(scene);
         //Define actions and functions
-        colorPicker.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + ";"));
-        fontSelector.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-font-family: " + (fontSelector.getValue()) + ";"));
-        fontSizeSelector.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-font-size: " + (fontSizeSelector.getValue()) + " px;"));
+        colorPicker.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;"));
+        fontSelector.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;"));
+        fontSizeSelector.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;"));
+        searchNextButton.setOnAction(e -> {
+            searchEngine search = new searchEngine(searchField, textPanel);
+            if (search.getMatches() > 0 && ref.request < search.getMatches()) {
+                ref.request++;
+                search.searchNext(searchField, textPanel, ref.request);
+                if (ref.request > 0) {
+                    searchPrevButton.setDisable(false);
+                }
+            }
+            if (ref.request == search.getMatches() - 1) {
+                searchNextButton.setDisable(true);
+            }
+        });
+        searchField.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                searchEngine search = new searchEngine(searchField, textPanel);
+                if (search.getMatches() > 0) {
+                    search.searchNext(searchField, textPanel, ref.request);
+                    if (search.getMatches() > 1) {
+                        searchNextButton.setDisable(false);
+                    }
+                } else {
+                    searchPrevButton.setDisable(true);
+                    searchNextButton.setDisable(true);
+                }
+            }
+        });
+        searchPrevButton.setOnAction(e -> {
+            searchEngine search = new searchEngine(searchField, textPanel);
+            if (search.getMatches() > 0) {
+                ref.request--;
+                search.searchPrev(searchField, textPanel, ref.request);
+                searchPrevButton.setDisable(false);
+                searchNextButton.setDisable(false);
+            } else {
+                searchPrevButton.setDisable(true);
+            }
+            if (ref.request == 0) {
+                searchPrevButton.setDisable(true);
+            }
+        });
         //final Clipboard clipboard = Clipboard.getSystemClipboard();
         //final ClipboardContent cbcontent = new ClipboardContent();
         FileChooser fileChooser = new FileChooser();
