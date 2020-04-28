@@ -87,8 +87,11 @@ public class App extends Application {
         List<MenuItem> edititems = List.of(editItemCut, editItemCopy, editItemPaste);
         editMenu.getItems().addAll(edititems);
         Menu runMenu = new Menu(labels.getString("runMenu"));
-        MenuItem runItemCNR = new Menu(labels.getString("runItemCNR"));
-        runMenu.getItems().add(runItemCNR);
+        Menu runItemCNR = new Menu(labels.getString("runItemCNR"));
+        MenuItem runItemCNRJava = new MenuItem("Java");
+        runItemCNR.getItems().addAll(runItemCNRJava);
+        MenuItem clearTerminal = new MenuItem (labels.getString("clearTerminal"));
+        runMenu.getItems().addAll(runItemCNR, clearTerminal);
         Menu aboutMenu = new Menu(labels.getString("aboutMenu"));
         MenuItem aboutItemAbout = new MenuItem (labels.getString("aboutItemAbout"));
         aboutMenu.getItems().add(aboutItemAbout);
@@ -272,7 +275,7 @@ public class App extends Application {
         editItemPaste.setOnAction(e -> {
             textPanel.paste();
         });
-        runItemCNR.setOnAction(e -> {
+        runItemCNRJava.setOnAction(e -> {
             Thread t = new Thread(() -> {
                 try {
                     terminalPanel.setText(JavaCNR.compileAndRun(lastFile.get()));
@@ -281,6 +284,9 @@ public class App extends Application {
                 }
             });
             t.start();
+        });
+        clearTerminal.setOnAction(e -> {
+            terminalPanel.setText("");
         });
         aboutItemAbout.setOnAction(e -> {
             Alert about = new Alert(Alert.AlertType.INFORMATION);
