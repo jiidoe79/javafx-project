@@ -7,17 +7,23 @@ import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -32,15 +38,15 @@ public class App extends Application {
                 + "," + (c.getBlue() * 255)
                 + ")";
     }
-    public static void errorBox(String errormessage) {
+    public static void errorBox(String errormessage, String titlemessage) {
             Alert errorbox = new Alert(Alert.AlertType.INFORMATION);
-            errorbox.setTitle("Error occured");
+            errorbox.setTitle(titlemessage);
             errorbox.setHeaderText(null);
             errorbox.setContentText(errormessage);
             errorbox.showAndWait();
     }
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws FileNotFoundException {
         //Set the Stage in place
         AtomicReference<String> lastFile = new AtomicReference<>("");
         Locale locale = Locale.getDefault();
@@ -53,6 +59,7 @@ public class App extends Application {
         var ref = new Object() {
             int request = 0;
         };
+        String resourcePath = "C:/Users/Juha/Desktop/javakurssi/javafx-project/src/main/resources/";
         //Set Menus and Menuitems
         Menu fileMenu = new Menu(labels.getString("fileMenu"));
         MenuItem fileItemNew = new MenuItem(labels.getString("fileItemNew"));
@@ -89,21 +96,32 @@ public class App extends Application {
         mbar.getMenus().add(runMenu);
         mbar.getMenus().add(aboutMenu);
         //Add toolbar items
-        Label fontLabel = new Label (" Font style ");
-        Label fontsizeLabel = new Label (" Font size ");
-        Label fontcolorLabel = new Label (" Font color ");
+        FileInputStream input = new FileInputStream(resourcePath + "images/fontstyle.png");
+        Image image = new Image(input);
+        ImageView fontIcon = new ImageView(image);
+        input = new FileInputStream(resourcePath + "images/fontsize.png");
+        image = new Image(input);
+        ImageView fontsizeIcon = new ImageView(image);
+        input = new FileInputStream(resourcePath + "images/fontcolor.png");
+        image = new Image(input);
+        ImageView fontcolorIcon = new ImageView(image);
         ColorPicker colorPicker = new ColorPicker();
         colorPicker.setValue(Color.BLACK);
         ComboBox fontSelector = new ComboBox(FXCollections.observableArrayList(Font.getFamilies()));
         String fontSizes[] = {"10", "12", "14", "16", "18", "20", "24", "28", "32", "40"};
         ComboBox fontSizeSelector = new ComboBox(FXCollections.observableArrayList(fontSizes));
         TextField searchField = new TextField();
+        input = new FileInputStream(resourcePath + "images/search.png");
+        image = new Image(input);
+        ImageView searchIcon = new ImageView(image);
         Button searchPrevButton = new Button("<");
+        Label matchesCounter = new Label (" 0 / 0 ");
+        matchesCounter.setTextAlignment(TextAlignment.CENTER);
         Button searchNextButton = new Button(">");
         searchNextButton.setDisable(true);
         searchPrevButton.setDisable(true);
         //Define layout and scene
-        HBox toolBar = new HBox(fontLabel, fontSelector, fontsizeLabel, fontSizeSelector, fontcolorLabel, colorPicker, searchField, searchPrevButton, searchNextButton);
+        HBox toolBar = new HBox(fontIcon, fontSelector, fontsizeIcon, fontSizeSelector, fontcolorIcon, colorPicker, searchIcon, searchField, searchPrevButton, matchesCounter, searchNextButton);
         VBox topPanel = new VBox(mbar, toolBar);
         TextArea textPanel = new TextArea();
         BorderPane bpane = new BorderPane();
@@ -120,6 +138,7 @@ public class App extends Application {
             if (search.getMatches() > 0 && ref.request < search.getMatches()) {
                 ref.request++;
                 search.searchNext(searchField, textPanel, ref.request);
+                matchesCounter.setText(" " + (ref.request + 1) + " / "+ search.getMatches() + " ");
                 if (ref.request > 0) {
                     searchPrevButton.setDisable(false);
                 }
@@ -130,15 +149,25 @@ public class App extends Application {
         });
         searchField.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
-                searchEngine search = new searchEngine(searchField, textPanel);
-                if (search.getMatches() > 0) {
-                    search.searchNext(searchField, textPanel, ref.request);
-                    if (search.getMatches() > 1) {
-                        searchNextButton.setDisable(false);
+                searchPrevButton.setDisable(true);
+                searchNextButton.setDisable(true);
+                matchesCounter.setText(" 0 / 0 ");
+                if (searchField.getText() != null && !searchField.getText().isEmpty()) {
+                    searchEngine search = new searchEngine(searchField, textPanel);
+                    ref.request = 0;
+                    if (search.getMatches() > 0) {
+                        matchesCounter.setText(" 1 / "+ search.getMatches() + " ");
+                        search.searchNext(searchField, textPanel, ref.request);
+                        if (search.getMatches() > 1) {
+                            searchNextButton.setDisable(false);
+                        }
+                    } else {
+                        App.errorBox(labels.getString("noMatchesText"), labels.getString("noMatchesTitle"));
+                        searchPrevButton.setDisable(true);
+                        searchNextButton.setDisable(true);
                     }
                 } else {
-                    searchPrevButton.setDisable(true);
-                    searchNextButton.setDisable(true);
+                    App.errorBox(labels.getString("noSearchItem"), labels.getString("noMatchesTitle"));
                 }
             }
         });
@@ -149,6 +178,7 @@ public class App extends Application {
                 search.searchPrev(searchField, textPanel, ref.request);
                 searchPrevButton.setDisable(false);
                 searchNextButton.setDisable(false);
+                matchesCounter.setText(" " + (ref.request + 1) + " / "+ search.getMatches() + " ");
             } else {
                 searchPrevButton.setDisable(true);
             }
@@ -156,8 +186,6 @@ public class App extends Application {
                 searchPrevButton.setDisable(true);
             }
         });
-        //final Clipboard clipboard = Clipboard.getSystemClipboard();
-        //final ClipboardContent cbcontent = new ClipboardContent();
         FileChooser fileChooser = new FileChooser();
         textPanel.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.TAB) {

@@ -30,7 +30,7 @@ public class FileHandler {
         try {
             content = Files.readString(Paths.get(filePath));
         } catch(IOException e) {
-            App.errorBox("Problem with IO");
+            App.errorBox("Problem with IO", "Error occured");
         }
         return content;
     }
@@ -39,7 +39,7 @@ public class FileHandler {
         try {
             Files.writeString(Paths.get(filePath), content);
         } catch(IOException e) {
-            App.errorBox("Problem with IO");
+            App.errorBox("Problem with IO", "Error occured");
         }
     }
 }
