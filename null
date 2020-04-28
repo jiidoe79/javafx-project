@@ -1,3 +1,40 @@
-oiseghoiserhgiuergegrg
-opdjrg
-pojjpopwoejr
+import java.util.Scanner;
+
+public class MyApp19 {
+    static int korkeus = 5;
+    public static void main(String [] args) {    
+        kansipiirto(korkeus);
+        int rivi = 2;
+        int b = korkeus;
+        while (rivi < b){
+            rivipiirto(rivi);
+            rivi = rivi + 1;
+        }
+        kansipiirto(korkeus);
+    }
+    public static void kansipiirto(int h){
+        int a = 1;
+        while (a < h){
+            System.out.print("X");
+            a = a + 1;
+        }
+        System.out.println("X");
+    }
+    public static void rivipiirto(int rivi){
+        System.out.print("X");
+        int b = korkeus - 1;
+        int kohta = 2;
+        while (kohta < b){
+            if (kohta == rivi){
+                System.out.print("X");
+            }
+            System.out.print(" ");
+            kohta++;
+        }
+        if (kohta == b && rivi == b){
+            System.out.print("X");
+            kohta++;
+        }
+        System.out.println("X");
+    }
+}

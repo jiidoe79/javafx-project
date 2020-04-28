@@ -1,6 +1,7 @@
 package com.company;
 
 import com.company.util.FileHandler;
+import com.company.util.JavaCNR;
 import com.company.util.searchEngine;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -24,6 +25,7 @@ import javafx.stage.StageStyle;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -127,7 +129,9 @@ public class App extends Application {
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
         splitPane.setDividerPositions(0.7);
-        VBox runTerminal  = new VBox(new Label("Run Terminal"));
+        TextArea terminalPanel = new TextArea();
+        VBox runTerminal  = new VBox(new Label("Run Terminal"), terminalPanel);
+        runTerminal.setVgrow(terminalPanel, Priority.ALWAYS);
         splitPane.getItems().addAll(textPanel, runTerminal);
         BorderPane bpane = new BorderPane();
         bpane.setTop(topPanel);
@@ -267,6 +271,16 @@ public class App extends Application {
         });
         editItemPaste.setOnAction(e -> {
             textPanel.paste();
+        });
+        runItemCNR.setOnAction(e -> {
+            Thread t = new Thread(() -> {
+                try {
+                    terminalPanel.setText(JavaCNR.compileAndRun(lastFile.get()));
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            });
+            t.start();
         });
         aboutItemAbout.setOnAction(e -> {
             Alert about = new Alert(Alert.AlertType.INFORMATION);
