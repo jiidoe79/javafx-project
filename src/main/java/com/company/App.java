@@ -2,10 +2,12 @@ package com.company;
 
 import com.company.util.FileHandler;
 import com.company.util.JavaCNR;
+import com.company.util.PreferencesData;
 import com.company.util.searchEngine;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
@@ -47,9 +49,10 @@ public class App extends Application {
             errorbox.setContentText(errormessage);
             errorbox.showAndWait();
     }
+
     @Override
-    public void start(Stage stage) throws FileNotFoundException {
-        //Set the Stage in place
+    public void start(Stage stage) throws IOException {
+        //Initialize the Stage and key objects
         AtomicReference<String> lastFile = new AtomicReference<>("");
         Locale locale = Locale.getDefault();
         ResourceBundle labels = ResourceBundle.getBundle("ui", locale);
@@ -61,7 +64,22 @@ public class App extends Application {
         var ref = new Object() {
             int request = 0;
         };
+        PreferencesData prefData = new PreferencesData();
         String resourcePath = "C:/Users/Juha/Desktop/javakurssi/javafx-project/src/main/resources/";
+        TextArea textPanel = new TextArea();
+        ColorPicker colorPicker = new ColorPicker();
+        colorPicker.setValue(Color.BLACK);
+        ComboBox fontSelector = new ComboBox(FXCollections.observableArrayList(Font.getFamilies()));
+        String fontSizes[] = {"10", "12", "14", "16", "18", "20", "24", "28", "32", "40"};
+        ComboBox fontSizeSelector = new ComboBox(FXCollections.observableArrayList(fontSizes));
+        File f = new File("./preferences.json");
+        if(f.exists() && !f.isDirectory()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            prefData = objectMapper.readValue(new File("./preferences.json"), PreferencesData.class);
+            fontSelector.setValue(prefData.getFont());
+            fontSizeSelector.setValue(prefData.getFontSize());
+            lastFile.set(prefData.getDefaultPath());
+        }
         //Set Menus and Menuitems
         Menu fileMenu = new Menu(labels.getString("fileMenu"));
         MenuItem fileItemNew = new MenuItem(labels.getString("fileItemNew"));
@@ -101,22 +119,34 @@ public class App extends Application {
         mbar.getMenus().add(runMenu);
         mbar.getMenus().add(aboutMenu);
         //Add toolbar items
-        FileInputStream input = new FileInputStream(resourcePath + "images/fontstyle.png");
+        FileInputStream input = null;
+        try {
+            input = new FileInputStream(resourcePath + "images/fontstyle.png");
+        } catch (FileNotFoundException e) {
+            App.errorBox("File not Found", "Error occured");
+        }
         Image image = new Image(input);
         ImageView fontIcon = new ImageView(image);
-        input = new FileInputStream(resourcePath + "images/fontsize.png");
+        try {
+            input = new FileInputStream(resourcePath + "images/fontsize.png");
+        } catch (FileNotFoundException e) {
+            App.errorBox("File not Found", "Error occured");
+        }
         image = new Image(input);
         ImageView fontsizeIcon = new ImageView(image);
-        input = new FileInputStream(resourcePath + "images/fontcolor.png");
+        try {
+            input = new FileInputStream(resourcePath + "images/fontcolor.png");
+        } catch (FileNotFoundException e) {
+            App.errorBox("File not Found", "Error occured");
+        }
         image = new Image(input);
         ImageView fontcolorIcon = new ImageView(image);
-        ColorPicker colorPicker = new ColorPicker();
-        colorPicker.setValue(Color.BLACK);
-        ComboBox fontSelector = new ComboBox(FXCollections.observableArrayList(Font.getFamilies()));
-        String fontSizes[] = {"10", "12", "14", "16", "18", "20", "24", "28", "32", "40"};
-        ComboBox fontSizeSelector = new ComboBox(FXCollections.observableArrayList(fontSizes));
         TextField searchField = new TextField();
-        input = new FileInputStream(resourcePath + "images/search.png");
+        try {
+            input = new FileInputStream(resourcePath + "images/search.png");
+        } catch (FileNotFoundException e) {
+            App.errorBox("File not Found", "Error occured");
+        }
         image = new Image(input);
         ImageView searchIcon = new ImageView(image);
         Button searchPrevButton = new Button("<");
@@ -128,7 +158,6 @@ public class App extends Application {
         //Define layout and scene
         HBox toolBar = new HBox(fontIcon, fontSelector, fontsizeIcon, fontSizeSelector, fontcolorIcon, colorPicker, searchIcon, searchField, searchPrevButton, matchesCounter, searchNextButton);
         VBox topPanel = new VBox(mbar, toolBar);
-        TextArea textPanel = new TextArea();
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
         splitPane.setDividerPositions(0.7);
@@ -142,9 +171,15 @@ public class App extends Application {
         Scene scene = new Scene(bpane, 960, 640);
         stage.setScene(scene);
         //Define actions and functions
-        colorPicker.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;"));
-        fontSelector.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;"));
-        fontSizeSelector.setOnAction((EventHandler) t -> textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;"));
+        colorPicker.setOnAction((EventHandler) t -> {
+            textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;");
+        });
+        fontSelector.setOnAction((EventHandler) t -> {
+            textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;");
+        });
+        fontSizeSelector.setOnAction((EventHandler) t -> {
+            textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;");
+        });
         searchNextButton.setOnAction(e -> {
             searchEngine search = new searchEngine(searchField, textPanel);
             if (search.getMatches() > 0 && ref.request < search.getMatches()) {
@@ -224,8 +259,6 @@ public class App extends Application {
                     Platform.runLater(() -> textPanel.setText(content));
                 });
                 t.start();
-                //String content = fh.open();
-                //textPanel.setText(content);
                 fileChooser.setInitialDirectory(new File(file.getParent()));
                 lastFile.set(fh.getFilePath());
                 fileItemSave.setDisable(false);
@@ -263,8 +296,26 @@ public class App extends Application {
                 fileItemSave.setDisable(false);
             } catch(NullPointerException npe) {}
         });
+        PreferencesData finalPrefData = prefData;
         fileItemExit.setOnAction(e -> {
-            System.exit(0);
+            finalPrefData.setFontSize((String) fontSizeSelector.getValue());
+            finalPrefData.setDefaultPath(lastFile.get());
+            finalPrefData.setFont((String) fontSelector.getValue());
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.writeValue(new File("./preferences.json"), finalPrefData);
+            } catch (Exception ea) {
+                //App.errorBox("IO Exception", "Error occured");
+                ea.printStackTrace();
+            }
+            Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            exitAlert.setTitle(labels.getString("exitAlertTitle"));
+            exitAlert.setHeaderText(null);
+            exitAlert.setContentText(labels.getString("exitAlertContent"));
+            Optional<ButtonType> result = exitAlert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                System.exit(0);
+            }
         });
         editItemCopy.setOnAction(e -> {
             textPanel.copy();

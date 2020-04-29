@@ -1,8 +1,6 @@
 package com.company.util;
 
-import com.company.App;
 import javafx.scene.control.*;
-
 import java.util.ArrayList;
 
 public class searchEngine {
