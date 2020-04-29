@@ -52,6 +52,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
         //Initialize the Stage and key objects
         AtomicReference<String> lastFile = new AtomicReference<>("");
         Locale locale = Locale.getDefault();
@@ -170,6 +171,7 @@ public class App extends Application {
         bpane.setCenter(splitPane);
         Scene scene = new Scene(bpane, 960, 640);
         stage.setScene(scene);
+
         //Define actions and functions
         colorPicker.setOnAction((EventHandler) t -> {
             textPanel.setStyle("-fx-text-fill: " + toRgbString(colorPicker.getValue()) + "; -fx-font-family: " + (fontSelector.getValue()) + "; -fx-font-size: " + (fontSizeSelector.getValue()) + " px;");
