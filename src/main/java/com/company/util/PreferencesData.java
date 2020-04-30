@@ -1,12 +1,5 @@
 package com.company.util;
 
-import java.io.File;
-import java.io.IOException;
-
-import com.company.App;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.scene.paint.Color;
-
 public class PreferencesData {
     private String font;
     private String fontSize;
