@@ -10,6 +10,7 @@ Entry level standard.
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
  
 ## Screenshots
+![Main GUI View](https://raw.githubusercontent.com/jiidoe79/javafx-project/master/screenshot.png)
 
 
 ## Tech/framework used
@@ -21,7 +22,13 @@ Entry level standard.
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/promo/ultimate/?gclid=Cj0KCQjwy6T1BRDXARIsAIqCTXrKgC_p1pU7PLrbKhiJ3XSlraxjA5QsOlhQJ3OlOxYfMWyaOF6s3uwaAuJjEALw_wcB)
 
 ## Features
-What makes your project stand out?
+- Basic text editing functions
+- Font selection (style, size, color)
+- Filehandling (open, save, save as)
+- Compile and Run function for code, output in separate splitpane consol
+- Errorhandling, alerts on save and new functions
+- Preferences save and load when exiting and opening program, including default filepath
+- Localization for English and Finnish
 
 ## Installation
 Program is not yet an executable but a Maven project, so you can only run it through Maven or any code editor supporting Maven. It uses features and functions from Java 13, so that is what you should have installed also.
